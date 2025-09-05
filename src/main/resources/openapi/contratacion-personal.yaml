@@ -1,0 +1,359 @@
+openapi: 3.0.1
+info:
+  title: Microservicio de Contratación de Personal
+  version: 1.0.3
+  description: >
+    API para gestionar el reclutamiento y contratación de trabajadores.
+    Incluye datos personales, familiares, educativos, de contacto y de seguridad social.
+servers:
+  - url: http://localhost:8080/api/contratacion
+paths:
+  /postulantes:
+    get:
+      summary: Listar postulantes (paginado)
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Número de página (0 = primera página)
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: Cantidad de registros por página
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Criterio de orden (ej. apellidos,asc o fechaRegistro,desc)
+      responses:
+        '200':
+          description: Página de postulantes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePostulanteResponse'
+    post:
+      summary: Registrar un nuevo postulante
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostulanteRequestDto'
+      responses:
+        '201':
+          description: Postulante registrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostulanteResponseDto'
+
+  /postulantes/{id}:
+    get:
+      summary: Obtener un postulante por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Datos del postulante
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostulanteResponseDto'
+        '404':
+          description: Postulante no encontrado
+    put:
+      summary: Actualizar un postulante
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostulanteRequestDto'
+      responses:
+        '200':
+          description: Postulante actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostulanteResponseDto'
+    delete:
+      summary: Eliminar un postulante
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Postulante eliminado
+
+  # Catálogos
+  /estado-civil:
+    get:
+      summary: Listar estados civiles
+      responses:
+        '200':
+          description: Lista de estados civiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EstadoCivilDto'
+
+  /sexo:
+    get:
+      summary: Listar sexos
+      responses:
+        '200':
+          description: Lista de sexos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SexoDto'
+
+  /grado-instruccion:
+    get:
+      summary: Listar grados de instrucción
+      responses:
+        '200':
+          description: Lista de grados de instrucción
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GradoInstruccionDto'
+
+  /sistema-previsional:
+    get:
+      summary: Listar sistemas previsionales
+      responses:
+        '200':
+          description: Lista de sistemas previsionales (AFP/ONP)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SistemaPrevisionalDto'
+
+  /afp:
+    get:
+      summary: Listar AFP disponibles
+      responses:
+        '200':
+          description: Lista de AFP
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AfpDto'
+
+  /tipo-documento:
+    get:
+      summary: Listar tipos de documento
+      responses:
+        '200':
+          description: Lista de tipos de documento
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TipoDocumentoDto'
+
+components:
+  schemas:
+    # 📌 Paginación
+    PagePostulanteResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostulanteResponseDto'
+        totalElements:
+          type: integer
+          example: 125
+        totalPages:
+          type: integer
+          example: 13
+        page:
+          type: integer
+          example: 0
+        size:
+          type: integer
+          example: 10
+
+    # 📌 DTOs Postulante
+    PostulanteRequestDto:
+      type: object
+      required:
+        - nombres
+        - apellidos
+        - tipoDocumentoId
+        - numeroDocumento
+        - fechaNacimiento
+        - sexoId
+        - nacionalidad
+        - direccion
+      properties:
+        nombres:
+          type: string
+        apellidos:
+          type: string
+        tipoDocumentoId:
+          type: integer
+        numeroDocumento:
+          type: string
+        fechaNacimiento:
+          type: string
+          format: date
+        estadoCivilId:
+          type: integer
+        sexoId:
+          type: integer
+        nacionalidad:
+          type: string
+        telefono:
+          type: string
+        celular:
+          type: string
+        correo:
+          type: string
+        direccion:
+          $ref: '#/components/schemas/DireccionDto'
+        sistemaPrevisionalId:
+          type: integer
+        afpId:
+          type: integer
+        numeroSeguro:
+          type: string
+        gradoInstruccionId:
+          type: integer
+        institucionEducativa:
+          type: string
+        nombreConyuge:
+          type: string
+        numeroHijos:
+          type: integer
+        hijos:
+          type: array
+          items:
+            $ref: '#/components/schemas/HijoDto'
+
+    PostulanteResponseDto:
+      allOf:
+        - $ref: '#/components/schemas/PostulanteRequestDto'
+        - type: object
+          properties:
+            id:
+              type: integer
+            fechaRegistro:
+              type: string
+              format: date-time
+
+    # 📌 Submodelos
+    HijoDto:
+      type: object
+      properties:
+        nombre:
+          type: string
+        edad:
+          type: integer
+
+    DireccionDto:
+      type: object
+      properties:
+        direccion:
+          type: string
+          example: Av. Siempre Viva 742
+        distrito:
+          type: string
+          example: Miraflores
+        provincia:
+          type: string
+          example: Lima
+        departamento:
+          type: string
+          example: Lima
+        pais:
+          type: string
+          example: Perú
+
+    # 📌 Catálogos
+    EstadoCivilDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        descripcion:
+          type: string
+
+    SexoDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        descripcion:
+          type: string
+
+    GradoInstruccionDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        descripcion:
+          type: string
+
+    SistemaPrevisionalDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        descripcion:
+          type: string
+          example: AFP
+
+    AfpDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+          example: Integra
+
+    TipoDocumentoDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+          example: DNI
