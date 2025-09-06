@@ -25,7 +25,7 @@ public class PostulanteImpl implements PostulanteRepository {
     @Override
     public Flux<Postulante> findAll(int page, int size) {
         long offset = (long) page * size;
-        return repository.findAllByActivoPaged(1, size, offset)
+        return repository.findAllPaged( size, offset)
                 .map(PostulanteMapper::fromEntity);
     }
 

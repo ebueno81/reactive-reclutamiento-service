@@ -10,7 +10,11 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface ReactivePostulanteRepository extends ReactiveCrudRepository<PostulanteEntity, Long> {
 
-    @Query("SELECT * FROM postulante WHERE activo = :activo LIMIT :size OFFSET :offset")
-    Flux<PostulanteEntity> findAllByActivoPaged(Integer activo, long size, long offset);
-
+    @Query("""
+           SELECT * 
+           FROM postulante
+           ORDER BY id DESC
+           LIMIT :size OFFSET :offset
+           """)
+    Flux<PostulanteEntity> findAllPaged(long size, long offset);
 }
