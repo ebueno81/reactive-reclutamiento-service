@@ -6,7 +6,9 @@ import com.rrhh.reclutamiento_sevice.application.usecase.postulante.ActualizarPo
 import com.rrhh.reclutamiento_sevice.application.usecase.postulante.BuscarPostulante;
 import com.rrhh.reclutamiento_sevice.application.usecase.postulante.ListarPostulantes;
 import com.rrhh.reclutamiento_sevice.application.usecase.postulante.RegistrarPostulante;
+import com.rrhh.reclutamiento_sevice.infrastructure.config.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,33 +29,36 @@ public class PostulanteController {
     ActualizarPostulante actualizarPostulante;
 
     @GetMapping
-    public Flux<PostulanteResponseDto> listar(
+    public Flux<ApiResponse<PostulanteResponseDto>> listar(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        return listarPostulantes.execute(page, size);
+        return listarPostulantes.execute(page, size)
+                .map(item-> ApiResponse.ok("OK",item));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<PostulanteResponseDto> registrar(@RequestBody PostulanteRequestDto dto) {
-        return registrarPostulante.execute(dto);
+    public Mono<ResponseEntity<ApiResponse<PostulanteResponseDto>>> registrar(@RequestBody PostulanteRequestDto dto) {
+        return registrarPostulante.execute(dto)
+                .map(body->ResponseEntity.status(HttpStatus.CREATED)
+                        .body(ApiResponse.ok("Postulante creado",body)));
     }
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<PostulanteResponseDto>> obtenerPorId(@PathVariable Long id) {
+    public Mono<ResponseEntity<ApiResponse<PostulanteResponseDto>>> obtenerPorId(@PathVariable Long id) {
         return buscarPostulante.execute(id)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,"No existe el postulante con Id " + id)))
+                .map(body -> ResponseEntity.ok(ApiResponse.ok("Postulante encontrado", body)));
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<PostulanteResponseDto>> actualizar(
+    public Mono<ResponseEntity<ApiResponse<PostulanteResponseDto>>> actualizar(
             @PathVariable Long id,
             @RequestBody PostulanteRequestDto dto) {
         return actualizarPostulante.execute(id, dto)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,"No existe el postulante con Id " + id)))
+                .map(body->ResponseEntity.ok(ApiResponse.ok("Postulante actualizado",body)));
     }
 
 }
