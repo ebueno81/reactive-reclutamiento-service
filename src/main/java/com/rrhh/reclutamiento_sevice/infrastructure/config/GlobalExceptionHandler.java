@@ -64,4 +64,20 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("Error interno. Intenta más tarde.")));
     }
+
+    @ExceptionHandler(org.springframework.web.bind.support.WebExchangeBindException.class)
+    public reactor.core.publisher.Mono<org.springframework.http.ResponseEntity<ApiResponse<Void>>> handleValidation(
+            org.springframework.web.bind.support.WebExchangeBindException ex) {
+
+        String details = ex.getFieldErrors().stream()
+                .map(err -> err.getField() + ": " + err.getDefaultMessage())
+                .collect(java.util.stream.Collectors.joining("; "));
+
+        return reactor.core.publisher.Mono.just(
+                org.springframework.http.ResponseEntity
+                        .status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                        .body(ApiResponse.error("Validación fallida: " + details))
+        );
+    }
+
 }
