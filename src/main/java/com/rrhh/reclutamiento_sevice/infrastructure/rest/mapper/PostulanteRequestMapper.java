@@ -1,7 +1,7 @@
 package com.rrhh.reclutamiento_sevice.infrastructure.rest.mapper;
 
 import com.rrhh.reclutamiento_sevice.application.dto.DireccionDto;
-import com.rrhh.reclutamiento_sevice.application.dto.HijoDto;
+import com.rrhh.reclutamiento_sevice.application.dto.PostulanteHijoDto;
 import com.rrhh.reclutamiento_sevice.application.dto.PostulanteRequestDto;
 import com.rrhh.reclutamiento_sevice.infrastructure.rest.dto.DireccionRequest;
 import com.rrhh.reclutamiento_sevice.infrastructure.rest.dto.HijoRequest;
@@ -49,10 +49,10 @@ public final class PostulanteRequestMapper {
         );
     }
 
-    private static List<HijoDto> toHijoDtoList(List<HijoRequest> hijos) {
+    private static List<PostulanteHijoDto> toHijoDtoList(List<HijoRequest> hijos) {
         if (hijos == null) return null;
         return hijos.stream()
-                .map(h -> new HijoDto(
+                .map(h -> new PostulanteHijoDto(
                         h.nombres(),
                         h.apellidos(),
                         h.fechaNacimiento(),

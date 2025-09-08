@@ -1,7 +1,7 @@
 package com.rrhh.reclutamiento_sevice.domain.model;
 
 import com.rrhh.reclutamiento_sevice.application.dto.DireccionDto;
-import com.rrhh.reclutamiento_sevice.application.dto.HijoDto;
+import com.rrhh.reclutamiento_sevice.application.dto.PostulanteHijoDto;
 
 
 import java.time.LocalDate;
@@ -28,7 +28,7 @@ public record Postulante(
         String institucionEducativa,
         String nombreConyuge,
         Integer numeroHijos,
-        List<HijoDto> hijos
+        List<PostulanteHijoDto> hijos
 ) {
     public Postulante withId(Long id) {
         return new Postulante(

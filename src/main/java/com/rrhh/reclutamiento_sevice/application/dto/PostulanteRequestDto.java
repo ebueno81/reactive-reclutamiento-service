@@ -23,5 +23,5 @@ public record PostulanteRequestDto(
         String institucionEducativa,
         String nombreConyuge,
         Integer numeroHijos,
-        List<HijoDto> hijos
+        List<PostulanteHijoDto> hijos
 ) {}

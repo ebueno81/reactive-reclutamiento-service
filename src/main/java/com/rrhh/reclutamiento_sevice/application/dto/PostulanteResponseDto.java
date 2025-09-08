@@ -28,5 +28,5 @@ public record PostulanteResponseDto(
         String nombreConyuge,
         Integer numeroHijos,
 
-        List<HijoDto> hijos
+        List<PostulanteHijoDto> hijos
 ) {}
